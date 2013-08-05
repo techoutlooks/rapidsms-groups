@@ -31,19 +31,18 @@ class FancyPhoneInput(forms.TextInput):
             value = re.sub(r'\D', '', value)
         return value
 
+contacts_queryset = Contact.objects.all()
 
 class GroupForm(forms.ModelForm):
+    objects = forms.ModelMultipleChoiceField(contacts_queryset, label='contacts', required=False)
 
     class Meta:
         model = Group
-        exclude = ('is_editable',)
+        exclude = ('is_editable', 'contacts')
 
-    def __init__(self, *args, **kwargs):
-        super(GroupForm, self).__init__(*args, **kwargs)
-        self.fields['contacts'].help_text = ''
-        qs = Contact.objects.filter().order_by('name')
-        self.fields['contacts'].queryset = qs
-        self.fields['contacts'].widget.attrs['class'] = 'horitzonal-multiselect'
+    def save(self, commit=True):
+        self.instance._pending = self.cleaned_data.get('objects')
+        return super(GroupForm, self).save(commit=commit)
 
 
 class ContactForm(forms.ModelForm):
@@ -64,7 +63,7 @@ class ContactForm(forms.ModelForm):
         self.fields['groups'].widget = forms.CheckboxSelectMultiple()
         self.fields['groups'].queryset = Group.objects.order_by('name')
         self.fields['groups'].required = False
-        for name in ('first_name', 'last_name', 'phone'):
+        for name in ('name',):
             self.fields[name].required = True
 
     def save(self, commit=True):

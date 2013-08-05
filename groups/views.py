@@ -4,22 +4,48 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Count
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
+from django_tables2 import RequestConfig
 
 from rapidsms.models import Contact
+from rapidsms import settings
 
 from groups.models import Group
 from groups.forms import GroupForm, ContactForm
+from .tables import GroupTable
+from .tables import ContactTable
 
 
 @login_required
 def list_groups(request):
-    groups = Group.objects.annotate(count=Count('contacts')).order_by('name')
-    return render(request, 'groups/groups/list.html', {
-        'groups': groups,
+    groups_table = GroupTable(
+        Group.objects.all(),
+        template="django_tables2/bootstrap-tables.html")
+
+    paginate = {"per_page": settings.PAGINATOR_OBJECTS_PER_PAGE}
+    RequestConfig(request, paginate=paginate).configure(groups_table)
+
+    return render(request, "groups/groups/list.html", {
+        "groups_table": groups_table,
     })
+
+
+@login_required
+def list_group_members(request, group_id=None):
+    if group_id:
+        group = get_object_or_404(Group, pk=group_id)
+        contacts_table = ContactTable(
+            group.contacts,
+            template="django_tables2/bootstrap-tables.html")
+
+        paginate = {"per_page": settings.PAGINATOR_OBJECTS_PER_PAGE}
+        RequestConfig(request, paginate=paginate).configure(contacts_table)
+
+        return render(request, "groups/groups/list_members.html", {
+            "contacts_table": contacts_table,
+            "group": group,
+        })
 
 
 @login_required

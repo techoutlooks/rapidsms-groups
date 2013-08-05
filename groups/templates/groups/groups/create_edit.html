@@ -1,34 +1,27 @@
 {% extends "groups/base.html" %}
 {% load i18n %}
+{% load forms_tags %}
 
 {% block title %}{% if form.instance.pk %}Edit Group{% else %}Create Group{% endif %}{% endblock %}
 
-{% block stylesheets %}
-    {{ block.super }}
-		<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/ui.multiselect.css" />
-{% endblock %}
-
-{% block javascripts %}
-    {{ block.super }}
-    <script src="{{ STATIC_URL }}js/forms.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/jquery.scrollTo-min.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/jquery.localisation-min.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}js/ui.multiselect.js" type="text/javascript"></script>
-    <script src="{{ STATIC_URL }}groups/js/groups.js" type="text/javascript"></script>
-{% endblock %}
-
 {% block content %}
-<div class="module">
-    <h2>{% if form.instance.pk %}Edit Group{% else %}Create Group{% endif %}</h2>
-    <form action="#" method="POST" class="buttons">
-        {% csrf_token %}
-        <table>
-            {{ form }}
-        </table>
-        <div class='form-action'>
-            <input type='button' name='cancel' value='Cancel' />
-            <input type='submit' name='submit' value="Save" />
-        </div>
-    </form>
-</div>
+    <div class="page_header">
+        {% if group %}
+	   <h2>Edit {{ group.name }}</h2>
+        {% else %}
+	   <h2>Add {{ group.name }}</h2>
+        {% endif %}
+    </div>
+    <div class="span8">
+        <form action="" method="post">
+            {% render_form form %}
+            {% csrf_token %}
+            <div class="submit">
+                <input type="submit" name="submit" class="btn btn-primary" value="Save Group" />
+                {% if group %}
+                    <input type="submit" name="submit" class="btn btn-primary" value="Delete Group" />
+                {% endif %}
+            </div>
+        </form>
+    </div>
 {% endblock %}
