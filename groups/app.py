@@ -12,7 +12,7 @@ class GroupsApp(AppBase):
         normalized_number = normalize_number(connection.identity)
         self.debug('Normalized number: {0}'.format(normalized_number))
         try:
-            contact = Contact.objects.get(phone=normalized_number)
+            contact = Contact.objects.get(connection=normalized_number)
         except Contact.DoesNotExist:
             self.debug('Failed to find matching contact')
             contact = None
