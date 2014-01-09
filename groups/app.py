@@ -69,6 +69,7 @@ class GroupsApp(AppBase):
             for name in set(mentions):
                 # TODO this is very error-prone. need to have a `slug`
                 # or `username` unique to each contact
+                # TODO allow @ addressing of identities (phone numbers) as well
                 matches = Contact.objects.filter(name__istartswith=name)
                 if len(matches) > 0:
                     contacts.append(matches[0])
