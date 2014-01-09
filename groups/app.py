@@ -1,7 +1,6 @@
 from rapidsms.apps.base import AppBase
 from rapidsms.models import Contact
 from rapidsms.contrib.messagelog.models import Message
-from rapidsms import router
 
 from groups.utils import normalize_number
 from .models import Group
@@ -33,11 +32,14 @@ class GroupsApp(AppBase):
             msg.respond('sorry you must be registered to message groups')
         if msg.contact not in group:
             msg.respond('sorry you must be a member of the group')
-        sender = msg.contact.name or msg.contact.default_connection.identity
+        if msg.contact and msg.contact.name:
+            sender = msg.contact.name
+        else:
+            sender = msg.connection.identity
         text = "{0}: {1}".format(sender, msg.text)
         recipients = set([contact.default_connection
                          for contact in group.contacts.all()])
-        recipients.discard(msg.contact.default_connection)
+        recipients.discard(msg.connection)
         # respond to sender
         sender_text = "sent to {0} members of {1}".format(len(recipients),
                                                           "#" + group.slug)
@@ -65,14 +67,20 @@ class GroupsApp(AppBase):
         if set(mentions):
             contacts = []
             for name in set(mentions):
-                contact = Contact.objects.get(name=name)
-                if contact:
-                    contacts.append(contact)
+                # TODO this is very error-prone. need to have a `slug`
+                # or `username` unique to each contact
+                matches = Contact.objects.filter(name__istartswith=name)
+                if len(matches) > 0:
+                    contacts.append(matches[0])
             if set(contacts):
                 recipients = [contact.default_connection
                               for contact in set(contacts)]
-                text = "{0}: {1}".format(msg.contact.name, msg.text)
-
-                router.send(text, list(recipients))
+                if msg.contact and msg.contact.name:
+                    sender = msg.contact.name
+                else:
+                    sender = msg.connection.identity
+                text = "{0}: {1}".format(sender, msg.text)
+                # 'respond' to recipients
+                message = msg.respond(text, connections=list(recipients))
         if len(msg.responses) > 0:
             return True
