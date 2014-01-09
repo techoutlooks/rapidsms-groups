@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 import logging
 import re
 
@@ -26,15 +24,18 @@ class FancyPhoneInput(forms.TextInput):
         return super(FancyPhoneInput, self).render(name, value, attrs)
 
     def value_from_datadict(self, data, files, name):
-        value = super(FancyPhoneInput, self).value_from_datadict(data, files, name)
+        value = super(FancyPhoneInput, self).value_from_datadict(data,
+                                                                 files, name)
         if value:
             value = re.sub(r'\D', '', value)
         return value
 
-contacts_queryset = Contact.objects.all()
+contacts_queryset = Contact.objects.all().order_by('name')
+
 
 class GroupForm(forms.ModelForm):
-    objects = forms.ModelMultipleChoiceField(contacts_queryset, label='contacts', required=False)
+    objects = forms.ModelMultipleChoiceField(queryset=contacts_queryset,
+                                             label='contacts', required=False)
 
     class Meta:
         model = Group
@@ -48,7 +49,8 @@ class GroupForm(forms.ModelForm):
 class ContactForm(forms.ModelForm):
     """ Form for managing contacts """
     groups = forms.ModelMultipleChoiceField(queryset=Group.objects.none())
-    phone = forms.CharField(validators=[validate_phone], widget=FancyPhoneInput)
+    phone = forms.CharField(validators=[validate_phone],
+                            widget=FancyPhoneInput)
 
     class Meta:
         model = Contact

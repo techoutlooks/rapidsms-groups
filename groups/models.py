@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.text import slugify
 
 from rapidsms.models import Contact
+from rapidsms.contrib.messagelog.models import Message
+from rapidsms import router
 
 from objectset.models import ObjectSet
 
@@ -21,6 +23,16 @@ class Group(ObjectSet):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Group, self).save(*args, **kwargs)
+
     @property
     def members(self):
         return len(self)
+
+
+class GroupMessage(models.Model):
+    group = models.ForeignKey(Group)
+    message = models.ForeignKey(Message)

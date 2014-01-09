@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -63,7 +61,11 @@ def create_edit_group(request, group_id=None):
             messages.info(request, 'Group saved successfully')
             return HttpResponseRedirect(reverse('list-groups'))
     else:
-        form = GroupForm(instance=group)
+        form = GroupForm(instance=group,
+                         initial={'objects': group.contacts.all(),
+                                  'name': group.name,
+                                  'slug': group.slug,
+                                  'description': group.description})
     return render(request, 'groups/groups/create_edit.html', {
         'form': form,
         'group': group,
