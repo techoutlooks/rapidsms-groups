@@ -2,7 +2,17 @@
 {% load i18n %}
 {% load forms_tags %}
 
-{% block title %}{% if form.instance.pk %}Edit Group{% else %}Create Group{% endif %}{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit Group{% else %}Create Group{% endif %}{% endblock title %}
+
+{% block extra_stylesheets %}
+  <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}groups/css/select2.css" />
+  <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}groups/css/select2-bootstrap.css" />
+{% endblock extra_stylesheets %}
+
+{% block extra_javascript %}
+  <script type="text/javascript" src="{{ STATIC_URL }}groups/js/select2.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}groups/js/groups.js"></script>
+{% endblock extra_javascript %}
 
 {% block content %}
     <div class="page_header">
@@ -24,4 +34,4 @@
             </div>
         </form>
     </div>
-{% endblock %}
+{% endblock content %}

@@ -1,5 +1,5 @@
 /* groups.js
  */
 $(document).ready(function() {
-    $('.horitzonal-multiselect').multiselect();
+    $("#id_objects").select2()
 });
