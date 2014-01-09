@@ -43,7 +43,7 @@ class GroupsApp(AppBase):
                                                           "#" + group.slug)
         msg.respond(sender_text)
         # 'respond' to group members
-        message = msg.respond(text, connections=recipients)
+        message = msg.respond(text, connections=list(recipients))
         if message is not None:
             if msg.logger_msg is not None and\
                msg.logger_msg.direction == Message.INCOMING:
@@ -73,6 +73,6 @@ class GroupsApp(AppBase):
                               for contact in set(contacts)]
                 text = "{0}: {1}".format(msg.contact.name, msg.text)
 
-                router.send(text, recipients)
+                router.send(text, list(recipients))
         if len(msg.responses) > 0:
             return True
