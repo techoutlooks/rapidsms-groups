@@ -50,7 +50,8 @@ class GroupsApp(AppBase):
             if msg.logger_msg is not None and\
                msg.logger_msg.direction == Message.INCOMING:
                 GroupMessage.objects.create(group=group,
-                                            message=msg.logger_msg)
+                                            message=msg.logger_msg,
+                                            num_recipients=len(recipients))
 
     def handle(self, msg):
         groups = []
@@ -82,6 +83,6 @@ class GroupsApp(AppBase):
                     sender = msg.connection.identity
                 text = "{0}: {1}".format(sender, msg.text)
                 # 'respond' to recipients
-                message = msg.respond(text, connections=list(recipients))
+                msg.respond(text, connections=list(recipients))
         if len(msg.responses) > 0:
             return True

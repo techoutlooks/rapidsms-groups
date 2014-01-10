@@ -5,8 +5,6 @@ from django.utils.text import slugify
 
 from rapidsms.models import Contact
 from rapidsms.contrib.messagelog.models import Message
-from rapidsms import router
-
 from objectset.models import ObjectSet
 
 
@@ -32,7 +30,17 @@ class Group(ObjectSet):
     def members(self):
         return len(self)
 
+    @property
+    def messages(self):
+        return self.groupmessage_set.all()
+
+    @property
+    def message_count(self):
+        return self.groupmessage_set.count()
+
 
 class GroupMessage(models.Model):
     group = models.ForeignKey(Group)
     message = models.ForeignKey(Message)
+    num_recipients = models.IntegerField(blank=True,
+                                         verbose_name='Number of recipients')
