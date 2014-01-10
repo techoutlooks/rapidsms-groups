@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 from django.conf.urls.defaults import url, patterns
 
 from groups import views
@@ -16,6 +14,10 @@ urlpatterns = patterns('',
         name='delete-group'),
     url(r'^group/(\d+)/members/$', views.list_group_members,
         name='list-group-members'),
+    url(r'^group/(\d+)/messages/$', views.list_group_messages,
+        name='list-group-messages'),
+    url(r'^group/(\d+)/send_message/$', views.send_group_message,
+        name='send-group-message'),
     url(r'^contact/$', views.list_contacts,
         name='list-contacts'),
     url(r'^contact/create/$', views.create_edit_contact,

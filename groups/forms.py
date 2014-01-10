@@ -4,8 +4,10 @@ import re
 from django import forms
 
 from rapidsms.models import Contact
+from rapidsms.router import send
 
 from groups.models import Group
+from groups.models import GroupMessage
 from groups.utils import format_number
 from groups.validators import validate_phone
 
@@ -72,3 +74,22 @@ class ContactForm(forms.ModelForm):
         instance = super(ContactForm, self).save()
         instance.groups = self.cleaned_data['groups']
         return instance
+
+
+class MessageForm(forms.Form):
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}))
+
+    def __init__(self, *args, **kwargs):
+        super(MessageForm, self).__init__(*args, **kwargs)
+        self.fields['message'].widget.attrs['placeholder'] = 'Message'
+
+    def send(self, sender=None, group=None):
+        message = self.cleaned_data['message']
+        text = "{0}: {1}".format(sender, message)
+        recipients = set([contact.default_connection
+                         for contact in group.contacts.all()])
+        sent = send(text, list(recipients))
+        GroupMessage.objects.create(group=group,
+                                    message=sent.logger_msg,
+                                    num_recipients=len(recipients))
+        return sent

@@ -2,16 +2,23 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect
+from django.http import HttpResponseForbidden
+from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_POST
 from django_tables2 import RequestConfig
 
 from rapidsms.models import Contact
 from rapidsms import settings
 
 from groups.models import Group
-from groups.forms import GroupForm, ContactForm
+from groups.forms import GroupForm
+from groups.forms import ContactForm
+from groups.forms import MessageForm
 from .tables import GroupTable
+from .tables import GroupMessageTable
 from .tables import ContactTable
 
 
@@ -44,6 +51,48 @@ def list_group_members(request, group_id=None):
             "contacts_table": contacts_table,
             "group": group,
         })
+
+
+@login_required
+def list_group_messages(request, group_id=None):
+    if group_id:
+        group = get_object_or_404(Group, pk=group_id)
+        groups_messages = GroupMessageTable(
+            group.messages,
+            template="django_tables2/bootstrap-tables.html")
+
+        paginate = {"per_page": settings.PAGINATOR_OBJECTS_PER_PAGE}
+        RequestConfig(request, paginate=paginate).configure(groups_messages)
+
+        return render(request, "groups/groups/list_messages.html", {
+            "groups_messages": groups_messages,
+            "group": group,
+            "form": MessageForm(),
+        })
+
+
+@login_required
+@require_POST
+def send_group_message(request, group_id=None):
+    try:
+        if group_id:
+            group = get_object_or_404(Group, pk=group_id)
+            user = request.user.username
+
+            form = MessageForm(request.POST)
+            if form.is_valid():
+                message = form.send(sender=user, group=group)
+                if len(message.connections) == 1:
+                    return HttpResponse('Your message was sent'
+                                        ' to 1 recipient.')
+                else:
+                    msg = 'Your message was sent to {0} ' \
+                        'recipients.'.format(len(message.connections))
+                    return HttpResponse(msg)
+        else:
+            return HttpResponseBadRequest(unicode(form.errors))
+    except:
+        return HttpResponse("Unable to send message.", status=500)
 
 
 @login_required
