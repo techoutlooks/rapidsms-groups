@@ -93,7 +93,7 @@ class PhoneTest(GroupCreateDataTest):
         return msg
 
     def test_contact_association(self):
-        number = normalize_number('13364130840', 'US')
+        number = normalize_number('13364130840', ('US',))
         connection = self.create_connection({'backend': self.backend,
                                              'identity': number})
         contact = self.create_contact()

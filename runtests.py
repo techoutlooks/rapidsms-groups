@@ -51,7 +51,7 @@ if not settings.configured:
             'django.core.context_processors.request',
             'django.core.context_processors.static',
         ],
-        COUNTRY_CODE='US',
+        COUNTRY_CODES=('US',),
     )
 
 
