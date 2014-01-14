@@ -1,3 +1,4 @@
 django-pagination==1.0.7
 django-sorter==0.2
 django-objectset==0.2.2
+phonenumbers==5.8b1
