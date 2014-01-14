@@ -13,19 +13,21 @@ class GroupsApp(AppBase):
         normalized_number = normalize_number(connection.identity)
         self.debug('Normalized number: {0}'.format(normalized_number))
         try:
-            contact = Contact.objects.get(connection=normalized_number)
+            contacts = Contact.objects.filter(connection__identity=
+                                              normalized_number)
         except Contact.DoesNotExist:
             self.debug('Failed to find matching contact')
             contact = None
-        if contact:
+        if contacts:
+            contact = contacts[0]
             self.debug('Associating connection to {0}'.format(contact))
             connection.contact = contact
             connection.save()
 
     def filter(self, msg):
-        if not msg.connection.contact:
-            self.debug('Found {0} without contact'.format(msg.connection))
-            self._associate_contact(msg.connection)
+        if not msg.connections[0].contact:
+            self.debug('Found {0} without contact'.format(msg.connections[0]))
+            self._associate_contact(msg.connections[0])
 
     def _send_to_group(self, group, msg):
         if msg.contact is None:

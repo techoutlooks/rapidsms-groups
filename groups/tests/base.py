@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 import string
 import random
 from contextlib import contextmanager
@@ -32,21 +30,27 @@ class CreateDataTest(TestCase):
             output += c + u' '
         return output
 
-    def create_backend(self, data={}):
+    def create_backend(self, data=None):
+        if data is None:
+            data = {}
         defaults = {
             'name': self.random_string(12),
         }
         defaults.update(data)
         return Backend.objects.create(**defaults)
 
-    def create_contact(self, data={}):
+    def create_contact(self, data=None):
+        if data is None:
+            data = {}
         defaults = {
             'name': self.random_string(12),
         }
         defaults.update(data)
         return Contact.objects.create(**defaults)
 
-    def create_connection(self, data={}):
+    def create_connection(self, data=None):
+        if data is None:
+            data = {}
         defaults = {
             'identity': self.random_string(10),
         }
@@ -55,9 +59,12 @@ class CreateDataTest(TestCase):
             defaults['backend'] = self.create_backend()
         return Connection.objects.create(**defaults)
 
-    def create_group(self, data={}):
+    def create_group(self, data=None):
+        if data is None:
+            data = {}
         defaults = {
-            'name': self.random_string(12),
+            'name': self.random_unicode_string(12),
+            'slug': self.random_unicode_string(12),
         }
         defaults.update(data)
         return Group.objects.create(**defaults)
