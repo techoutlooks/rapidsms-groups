@@ -1,11 +1,9 @@
 import os
 from setuptools import setup, find_packages
 
-required_packages = [
-	'django>=1.3',
-	'django-pagination==1.0.7',
-	'django-sorter==0.2',
-]
+required_packages = [line.strip('\n') for line in
+                     open('requirements.txt').readlines()]
+
 
 def read_file(filename):
     """Read a file into a string"""
@@ -24,7 +22,7 @@ setup(
     author_email='solutions@caktusgroup.com',
     packages=find_packages(),
     include_package_data=True,
-    url='http://github.com/caktus/rapidsms-groups/',
+    url='http://github.com/ewheeler/rapidsms-groups/',
     license='BSD',
     description=u' '.join(__import__('groups').__doc__.splitlines()).strip(),
     classifiers=[
