@@ -40,18 +40,16 @@ Configure django_sorter::
         'sort_groups': ['id', 'name', 'count'],
     }
 
+Add a tuple of allowed `country codes<http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>`_ for phone number normalization::
+
+    COUNTRY_CODES = ('US',)
+
 Add contacts URLs to your urlconf::
 
     urlpatterns += patterns('',
         (r'^groups/', include('groups.urls')),
     )
 
-Optionally, add links to groups and contacts in your ``RAPIDSMS_TABS`` setting::
-
-    RAPIDSMS_TABS += [
-        ('groups.views.list_groups', 'Groups'),
-        ('groups.views.list_contacts', 'Contacts'),
-    ]
 
 Finally, run syncdb or migrate::
 
@@ -75,7 +73,7 @@ License
 -------
 
 rapidsms-groups is released under the BSD License. See the `LICENSE
-<https://github.com/caktus/rapidsms-groups/blob/master/LICENSE>`_ file for
+<https://github.com/ewheeler/rapidsms-groups/blob/master/LICENSE>`_ file for
 more details.
 
 
@@ -84,7 +82,7 @@ Contributing
 
 If you think you've found a bug or are interested in contributing to this
 project check out `rapidsms-groups on Github
-<https://github.com/caktus/rapidsms-groups>`_.
+<https://github.com/ewheeler/rapidsms-groups>`_.
 
 Development sponsored by `Caktus Consulting Group, LLC
 <http://www.caktusgroup.com/services>`_.
