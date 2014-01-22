@@ -65,10 +65,15 @@ class GroupsApp(AppBase):
                 mentions.append(token[1:])
         if set(groups):
             for slug in set(groups):
-                group = Group.objects.get(slug=slug)
-                self._send_to_group(group, msg)
+                try:
+                    group = Group.objects.get(slug=slug)
+                    self._send_to_group(group, msg)
+                except Group.DoesNotExist:
+                    # TODO add magic groups (e.g., #vht sends to vht's team)
+                    pass
         if set(mentions):
             contacts = []
+            # TODO enable/disable with setting
             for name in set(mentions):
                 # TODO this is very error-prone. need to have a `slug`
                 # or `username` unique to each contact
