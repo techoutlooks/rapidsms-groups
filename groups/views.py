@@ -110,11 +110,16 @@ def create_edit_group(request, group_id=None):
             messages.info(request, 'Group saved successfully')
             return HttpResponseRedirect(reverse('list-groups'))
     else:
-        form = GroupForm(instance=group,
-                         initial={'objects': group.contacts.all(),
-                                  'name': group.name,
-                                  'slug': group.slug,
-                                  'description': group.description})
+        if group:
+            form = GroupForm(
+                instance=group,
+                initial={
+                    'objects': group.contacts.all(),
+                    'name': group.name,
+                    'slug': group.slug,
+                    'description': group.description})
+        else:
+            form = GroupForm()
     return render(request, 'groups/groups/create_edit.html', {
         'form': form,
         'group': group,
