@@ -1,0 +1,37 @@
+{% extends "groups/base.html" %}
+{% load i18n %}
+{% load forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit Group{% else %}Create Group{% endif %}{% endblock title %}
+
+{% block extra_stylesheets %}
+  <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}groups/css/select2.css" />
+  <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}groups/css/select2-bootstrap.css" />
+{% endblock extra_stylesheets %}
+
+{% block extra_javascript %}
+  <script type="text/javascript" src="{{ STATIC_URL }}groups/js/select2.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}groups/js/groups.js"></script>
+{% endblock extra_javascript %}
+
+{% block content %}
+    <div class="page_header">
+        {% if group %}
+	   <h2>Edit {{ group.name }}</h2>
+        {% else %}
+	   <h2>Add {{ group.name }}</h2>
+        {% endif %}
+    </div>
+    <div class="span8">
+        <form action="" method="post">
+            {% render_form form %}
+            {% csrf_token %}
+            <div class="submit">
+                <input type="submit" name="submit" class="btn btn-primary" value="Save Group" />
+                {% if group %}
+                    <input type="submit" name="submit" class="btn btn-primary" value="Delete Group" />
+                {% endif %}
+            </div>
+        </form>
+    </div>
+{% endblock content %}

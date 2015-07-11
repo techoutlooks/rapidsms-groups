@@ -1,0 +1,114 @@
+{% extends "groups/base.html" %}
+{% load django_tables2 %}
+
+{% block title %}#{{ group.slug }} Group Messages{% endblock %}
+
+{% block extra_javascript %}
+
+    <!-- Maintain an accurate char count of the message, taking unicode into account. -->
+    <script type="text/javascript" src="{{ STATIC_URL }}messaging/javascripts/jquery.simplyCountable.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#message-field textarea").simplyCountable();
+	    clearMessage();
+        });
+        function clearMessage() {
+            $("#message-field textarea").val("");
+            $("#counter").text("160");
+        }
+        function addNotification(type, message) {
+            var cls = type === null ? "alert" : "alert alert-" + type;
+            var dismiss = $("<button>").attr("data-dismiss", "alert").addClass("close").html("&times;");
+            var notif = $("<div>").addClass(cls).html(message).prepend(dismiss);
+            $("#notifications").append(notif);
+        }
+        function clearNotifications() {
+            $("#notifications").children().alert("close");
+        }
+
+        $(function() {
+            // Activate the "remove all recipients" link.
+            $("#reset-recipients").click(function(event) {
+                event.preventDefault();
+                clearRecipients();
+            });
+
+            // It's too easy for the user to hit "Enter" before they intend to send the message.
+            // We'll handle the submission manually.
+            $("#send-message-form").submit(function(event) {
+                return false;
+            });
+            $("#send-message").click(function(event) {
+                clearNotifications();
+
+                // Check for basic error conditions.
+                var valid = true;
+                if ($("#message-field textarea").val() === "") {
+                    addNotification("error", "You have to write a message.");
+                    valid = false;
+                }
+                if (!valid) { return; }
+
+                // Send the form to the server for processing.
+                $.ajax({
+                    url: "{% url 'send-group-message' group.pk %}",
+                    type: "POST",
+                    data: $("#send-message-form").serialize(),
+                    success: function(data, status, xhr) {
+                        addNotification("success", data);
+                        clearMessage();
+                    },
+                    error: function(xhr, status, errorThrown) {
+                        addNotification("error", "A problem occurred while trying to send your message. " +
+                                                 "Please contact your administrator if this keeps happening.");
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock extra_javascript %}
+{% block extra_stylesheets %}
+    {# Required by selectable. #}
+    <link type="text/css" rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/smoothness/jquery-ui.css" />
+    <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}selectable/css/dj.selectable.css" />
+    <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}messaging/stylesheets/messaging.css" />
+    <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}groups/css/groups.css" />
+{% endblock %}
+
+{% block content %}
+
+<div class='module'>
+    <h2>#{{ group.slug }} Group Messages</h2>
+    <div class="row">
+    <div class="span6">
+        <form class="form-search">
+          <input type="text" class="input-medium search-query" name="search" value="">
+          <button type="submit" class="btn">Search</button>
+        </form>
+    </div>
+    </div>
+    <div class="row">
+    <div class="span6 well">
+	<h4>Send a Text Message to members of #{{ group.slug }}</h4>
+        <div id="notifications">{# Container for form errors and messages. #}</div>
+        <form id="send-message-form">
+            {% csrf_token %}
+            <fieldset id="message-field" class="group">
+		<label for="sender">From:
+	            <input name="sender" type="text" disabled="disabled" value="{{ user.username }}"/>
+		</label>
+                {{ form.message }}
+                <div class="count pull-right">
+                    <span id="counter" class="badge"></span> characters remaining
+                </div>
+            </fieldset>
+        </form>
+        {# Keep this outside of the form to prevent accidental form submission. #}
+        <button id="send-message" class="btn btn-primary">Send Message</button>
+    </div>
+    </div>
+    {% render_table groups_messages %}
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "groups/base.html" %}
+{% load django_tables2 %}
+
+{% block title %}{{ group.name }} members{% endblock %}
+
+{% block content %}
+
+<div class='module'>
+<h2>{{ group.name }} members</h2>
+    {% render_table contacts_table %}
+</div>
+{% endblock %}
