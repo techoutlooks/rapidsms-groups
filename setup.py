@@ -3,7 +3,10 @@ from setuptools import setup, find_packages
 
 required_packages = [line.strip('\n') for line in
                      open('requirements.txt').readlines()]
-
+                     
+dependency_links=[
+    '-e git+https://github.com/techoutlooks/django-objectset.git@develop#egg=django_objectset',
+]
 
 def read_file(filename):
     """Read a file into a string"""

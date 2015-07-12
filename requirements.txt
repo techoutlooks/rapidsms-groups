@@ -1,4 +1,3 @@
 django-pagination==1.0.7
 django-sorter==0.2
--e git+https://github.com/techoutlooks/django-objectset.git#egg=django_objectset
 phonenumbers==5.8b1
